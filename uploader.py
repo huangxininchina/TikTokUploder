@@ -14,7 +14,7 @@ def uploadVideo(session_id, video, title, tags):
 	r = session.get(url,headers = headers)
 	if not assertSuccess(url, r):
 		return False
-	url = "https://tiktok.com/api/v1/web/project/create/?type=1&aid=1988"
+	url = "https://www.tiktok.com/api/v1/web/project/create/?type=1&aid=1988"
 	headers = {
 		"X-Secsdk-Csrf-Request":"1",
 		"X-Secsdk-Csrf-Version":"1.2.8"
@@ -26,7 +26,7 @@ def uploadVideo(session_id, video, title, tags):
 	creationID = tempInfo["creationID"]
 	projectID = tempInfo["project_id"]
 	# 获取账号信息
-	url = "https://tiktok.com/passport/web/account/info/"
+	url = "https://www.tiktok.com/passport/web/account/info/"
 	r = session.get(url)
 	if not assertSuccess(url, r):
 		return False
@@ -42,7 +42,7 @@ def uploadVideo(session_id, video, title, tags):
 	time.sleep(3)
 	title = result[0]
 	text_extra = result[1]
-	url = "https://tiktok.com/api/v1/web/project/post/?aid=1988"
+	url = "https://www.tiktok.com/api/v1/web/project/post/?aid=1988"
 	data = {
 		"upload_param": {
 			"video_param": {
@@ -52,8 +52,8 @@ def uploadVideo(session_id, video, title, tags):
 			},
 			"visibility_type": 0,
 			"allow_comment": 1,
-			"allow_duet": 0,
-			"allow_stitch": 0,
+			"allow_duet": 1,
+			"allow_stitch": 1,
 			"sound_exemption": 0,
 			"geofencing_regions": [],
 			"creation_id": creationID,
@@ -68,24 +68,25 @@ def uploadVideo(session_id, video, title, tags):
 	}
 	headers = {
 		# "X-Secsdk-Csrf-Token": x_csrf_token,
-		'Host': 'tiktok.com',
-		'authority': 'tiktok.com',
-		'pragma': 'no-cache',
-		'cache-control': 'no-cache',
+		# 'Host': 'tiktok.com',
+		'authority': 'www.tiktok.com',
+		# 'pragma': 'no-cache',
+		# 'cache-control': 'no-cache',
 		'sec-ch-ua': '"Not_A Brand";v="99", "Google Chrome";v="109", "Chromium";v="109"',
 		'accept': 'application/json, text/plain, */*',
 		'content-type': 'application/json',
 		'sec-ch-ua-mobile': '?0',
 		'user-agent': UA,
 		'sec-ch-ua-platform': '"macOS"',
-		'origin': 'https://tiktok.com',
+		'origin': 'https://www.tiktok.com',
 		'sec-fetch-site': 'same-site',
 		'sec-fetch-mode': 'cors',
 		'sec-fetch-dest': 'empty',
-		'referer': 'https://tiktok.com/',    # network find vn tiktok, referer: https://www.tiktok.com/creator
+		'referer': 'https://www.tiktok.com/',    # network find vn tiktok, referer: https://www.tiktok.com/creator
 		'accept-language': 'zh-CN,zh;q=0.9,en;q=0.8'
 	}
-	r = session.post(url, data=json.dumps(data), headers=headers)
+	headers2 = {"authority": "www.tiktok.com","accept": "application/json, text/plain, */*","accept-encoding": "gzip, deflate, br","accept-language": "en","content-length": "%s" %len(data) ,"content-type": "application/json","origin": "https://www.tiktok.com","referer": "https://www.tiktok.com/creator","sec-ch-ua": "\"Chromium\";v=\"110\", \"Not A(Brand\";v=\"24\", \"Google Chrome\";v=\"110\"","sec-ch-ua-mobile": "?0","sec-ch-ua-platform": "\"macOS\"","sec-fetch-dest": "empty","sec-fetch-mode": "cors","sec-fetch-site": "same-origin","user-agent": UA}
+	r = session.post(url, data=json.dumps(data), headers=headers2)
 	if not assertSuccess(url, r):
 		log('发布失败')
 		printError(url, r)
