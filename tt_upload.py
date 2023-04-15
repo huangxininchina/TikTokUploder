@@ -3,6 +3,7 @@ from deta import Deta
 import time
 import requests
 import json
+import os
 
 deta = Deta("c0cgqjui_JYrRnnJL9539GXuwFAW59RsfMUgCL5Cd")
 to_upload = deta.Base('tk_upload')
@@ -27,9 +28,8 @@ def upload_feedback(raw_data, result):
     url = "https://open.feishu.cn/open-apis/bitable/v1/apps/bascnkKSvx583V9CBpQ3rOEKcUf/tables/tblZB3mSz2zYnWTp/records/%s" %raw_data['record_id']
     payload = json.dumps({
         "fields": {
-            "发布状态": [
-                "%s" %result
-            ]
+            "发布状态": "%s" %result
+            
         }
     })
     headers = {
@@ -46,15 +46,36 @@ def upload_feedback(raw_data, result):
 
 
 
+def get_download_link(file_token):
+    url = "https://open.feishu.cn/open-apis/drive/v1/medias/batch_get_tmp_download_url?file_tokens=%s" %file_token
+    payload = ''
+
+
+    headers = {
+    'Authorization': 'Bearer %s' %get_token()
+    }
+
+    response = requests.request("GET", url, headers=headers, data=payload).json()
+    if response['code'] == 0:
+        return response['data']['tmp_download_urls'][0]['tmp_download_url']
+    else:
+        return ''
+    
+
 
 def upload_tasks():
     tasks = to_upload.fetch().items
     if len(tasks)>0:
         for task in tasks:
-            session_id = task['session_id']
-            video_path = task['video_path']
-            title = task['title']
-            tags = task['tags']
+            session_id = task['session_id'][0]['text']
+            video_token = task['视频'][0]['file_token']
+            video_url = get_download_link(video_token)
+            with requests.get(video_url) as r:
+                with open('temp.mp4', 'wb') as o:
+                    o.write(r.content)
+            video_path = os.path.join( r'C:\Users\Administrator\Desktop\TikTokUploder', 'temp.mp4' )   
+            title = task['标题']
+            tags = task['标签（#开头，空格间隔）']
         # session_id = 'c69bd7c225128f0b52e17e4d7b9adaaf'
         # video_path = '/Users/nobody1/Downloads/final_video.mp4'
         # title = 'Đồ chơi trẻ em thú vị'
